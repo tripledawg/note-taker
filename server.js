@@ -13,7 +13,7 @@ const PORT = process.env.prt || 3001;
 
 //establishing 
 app.listen(PORT, () =>
-    console.log(`Example app listening at http://localhost:${PORT}`)
+    console.log(`Note app listening at http://localhost:${PORT}`)
 );
 
 //middleware
@@ -22,18 +22,18 @@ app.use(express.json()); //allows text output as JSON format
 
 //establishing server routes
 //establishing endpoint for the saved notes
-app.get('/api/notes', (req, res) => {  
+app.get('/api/notes', (req, res) => {
     res.sendFile(path.join(__dirname, 'db/db.json'));
 });
 
 //establishing endpoint for notes page
 app.get('/notes', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/notes.html')); 
+    res.sendFile(path.join(__dirname, 'public/notes.html'));
 });
 
 //establising endpoint for getting started page and also any unassigned routes
 app.get('*', (req, res) =>
-    res.sendFile(path.join(__dirname, 'public/index.html')) 
+    res.sendFile(path.join(__dirname, 'public/index.html'))
 );
 
 //establishing endpoint for writing notes
@@ -48,8 +48,10 @@ app.post('/api/notes', (req, res) => {
         note.id = uuidv4();
         db.push(note);
         fs.writeFile('./db/db.json', JSON.stringify(db), (err, data) => {
-            if (err) throw err;
-            console.log('Data is : ' + data);
+            if (err) {
+                console.log('Data is : ' + data);
+                throw err;
+            }
         });
         res.status(200).json(note);
         return;
@@ -58,6 +60,25 @@ app.post('/api/notes', (req, res) => {
         res.status(400).json('Note not found in request');
     }
 });
+
+//BONUS delete method
+
+//if the unique id is equal to the id of the note with the delete request
+app.delete('/api/notes/:id', (req, res) => {
+    let noteIndex = db.findIndex((note) => note.id == req.params.id); //find the index of a note of it has an id equal to the passed in id
+    if (noteIndex) {
+        db.splice(noteIndex, 1);  //then take out that one note starting at that index position
+        fs.writeFile('./db/db.json', JSON.stringify(db), (err, data) => {
+            if (err) {
+                console.log('Data is : ' + data);
+                throw err;
+            }
+        });
+        return res.status(200).json('Note deleted.');
+    }
+    return res.status(404).json('Note not found.');
+});
+
 
 
 
