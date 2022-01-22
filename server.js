@@ -1,32 +1,51 @@
+//required global constants
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const db = require('./db/db.json');
 const { v4: uuidv4 } = require('uuid');
 
+//initilizing express app 
 const app = express();
+
+//establishing PORT as a process environment port for heroku, with a backup port of local:3001;
 const PORT = process.env.prt || 3001;
 
-app.use(express.static('public')); //middleware
-app.use(express.json());
+//establishing 
+app.listen(PORT, () =>
+    console.log(`Example app listening at http://localhost:${PORT}`)
+);
 
-app.get('/api/notes', (req, res) => {  //endpoint 
+//middleware
+app.use(express.static('public')); //creates a static path for all files in public folder
+app.use(express.json()); //allows text output as JSON format
+
+//establishing server routes
+//establishing endpoint for the saved notes
+app.get('/api/notes', (req, res) => {  
     res.sendFile(path.join(__dirname, 'db/db.json'));
 });
 
+//establishing endpoint for notes page
 app.get('/notes', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/notes.html'));
-})
+    res.sendFile(path.join(__dirname, 'public/notes.html')); 
+});
 
+//establising endpoint for getting started page and also any unassigned routes
 app.get('*', (req, res) =>
-    res.sendFile(path.join(__dirname, 'public/index.html')) //fallback route in case route not defined
+    res.sendFile(path.join(__dirname, 'public/index.html')) 
 );
 
+//establishing endpoint for writing notes
+//if the request body has content, assign it to the note variable and give it an id using the UUID node module 
+//then push the note onto the JSON db array then use the file system module's writeFile method to turn the JSON object into a string 
+//and write the file to the db.JSON file in the db folder
+//callback included to return the note and a 200 status if all was well or a 400 status if not
 app.post('/api/notes', (req, res) => {
     if (req.body) {
         let note = req.body;
         console.log(req.body);
-        note.uuid = uuidv4();
+        note.id = uuidv4();
         db.push(note);
         fs.writeFile('./db/db.json', JSON.stringify(db), (err, data) => {
             if (err) throw err;
@@ -40,35 +59,5 @@ app.post('/api/notes', (req, res) => {
     }
 });
 
-// ///
-// const { title, text } = req.body;
-
-// if (title && text) {
-//     // Variable for the object we will save
-//     const newNote = {
-//       title,
-//       text,
-//       upvotes: Math.floor(Math.random() * 100),
-//       review_id: uuid(),
-//     };
-
-// // Convert the data to a string so we can save it
-// const noteString = JSON.stringify(newNote);
-
-// // Write the string to a file
-// fs.writeFile(`./db/${newNote.title}.json`, noteString, (err) =>
-//   err
-//     ? console.error(err)
-//     : console.log(
-//         `Review for ${newNote.title} has been written to JSON file`
-//       )
-// );
-// ////
 
 
-app.listen(PORT, () =>
-    console.log(`Example app listening at http://localhost:${PORT}`)
-);
-
-
-//next, write note
