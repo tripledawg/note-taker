@@ -9,11 +9,11 @@ const { v4: uuidv4 } = require('uuid');
 const app = express();
 
 //establishing PORT as a process environment port for heroku, with a backup port of local:3001;
-const PORT = process.env.prt || 3001;
+const port = process.env.PORT || 3001;
 
 //establishing 
-app.listen(PORT, () =>
-    console.log(`Note app listening at http://localhost:${PORT}`)
+app.listen(port, () =>
+    console.log(`Note app listening at http://localhost:${port}`)
 );
 
 //middleware
