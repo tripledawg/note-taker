@@ -4,6 +4,8 @@
 
 ![responsive screenshot](screenshot_responsive.png) 
 
+## [Click here to visit the deployed page on Heroku.](https://note-taker-01152022-lc.herokuapp.com/)
+
   ## Licensing:
   [![license](https://img.shields.io/badge/license-none-blue)](https://shields.io)
   ## Table of Contents: 
